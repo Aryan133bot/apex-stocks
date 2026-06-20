@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APEX | Nightly Trade Intelligence</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 40px;
+            background-image: radial-gradient(circle at top right, #1e293b, transparent 40%),
+                              radial-gradient(circle at bottom left, #0f172a, transparent 40%);
+            min-height: 100vh;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 20px;
+            margin-bottom: 40px;
+        }
+        .logo { font-size: 32px; font-weight: 800; letter-spacing: 2px; color: white; }
+        .logo span { color: var(--accent-blue); }
+        .date { font-size: 14px; color: var(--text-muted); font-weight: 600; letter-spacing: 1px; }
+        
+        .regime-card {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(15, 23, 42, 0));
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 40px;
+            backdrop-filter: blur(10px);
+        }
+        .regime-title { font-size: 12px; text-transform: uppercase; color: var(--accent-blue); letter-spacing: 2px; margin-bottom: 10px; font-weight: 600; }
+        .regime-value { font-size: 36px; font-weight: 700; margin: 0; }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 24px; }
+        
+        .stock-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 24px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .stock-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            border-color: rgba(255,255,255,0.1);
+        }
+        .ticker { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+        .decision { 
+            position: absolute; top: 24px; right: 24px;
+            padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; letter-spacing: 1px;
+        }
+        .decision.BUY { background: rgba(16, 185, 129, 0.2); color: var(--accent-green); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .decision.REJECT { background: rgba(239, 68, 68, 0.2); color: var(--accent-red); border: 1px solid rgba(239, 68, 68, 0.3); }
+        .decision.HOLD { background: rgba(59, 130, 246, 0.2); color: var(--accent-blue); border: 1px solid rgba(59, 130, 246, 0.3); }
+        
+        .score-row { display: flex; justify-content: space-between; margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 16px; }
+        .score-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;}
+        .score-val { font-size: 20px; font-weight: 600; }
+        
+        .reasoning { margin-top: 16px; font-size: 13px; color: #cbd5e1; line-height: 1.6; background: rgba(0,0,0,0.25); padding: 16px; border-radius: 8px; border-left: 3px solid rgba(255,255,255,0.1); }
+        .reasoning strong { color: white; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">APEX<span>_</span></div>
+        <div class="date">{{ date }} | ALGORITHMIC VERDICT</div>
+    </div>
+    
+    <div class="regime-card">
+        <div class="regime-title">Current Macro Regime Environment</div>
+        <div class="regime-value">HMM State {{ regime_state }} (Multiplier: {{ regime_mult }})</div>
+    </div>
+
+    <h2 style="margin-bottom: 24px; font-weight: 300; letter-spacing: 1px; border-left: 4px solid var(--accent-blue); padding-left: 12px;">Trade Intelligence Matrix</h2>
+    
+    <div class="grid">
+        {% for stock in stocks %}
+        <div class="stock-card">
+            <div class="ticker">{{ stock['ticker'] }}</div>
+            <div class="decision {{ stock['decision'] }}">{{ stock['decision'] }}</div>
+            
+            <div class="score-row">
+                <div>
+                    <div class="score-label">Final APEX Score</div>
+                    <div class="score-val">{{ "%.1f"|format(stock['final_score']) }} <span style="font-size: 12px; color: var(--text-muted);">/ 100</span></div>
+                </div>
+            </div>
+            
+            <div class="reasoning">
+                <strong>Debate Engine Logs:</strong><br>
+                {{ stock['reason'] }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
